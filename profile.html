@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Profile | Interstolix</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { background-color: #fff; color: #000; font-family: Arial, sans-serif; }
+  .topbar { background-color: #fff; border-bottom: 1px solid #000; }
+  .topbar a { color: #000 !important; font-weight: 500; text-decoration: none; }
+  .topbar a:hover { color: #444 !important; }
+  .boxed { max-width: 1200px; margin: auto; padding: 0 15px; }
+  h2 { margin-top: 2rem; margin-bottom: 1rem; }
+  .profile-section { margin-bottom: 2rem; border: 1px solid #000; border-radius: 1rem; padding: 1rem; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .btn-add { background-color: #000; color: #fff; border-radius: 2rem; padding: 0.25rem 1rem; border: none; }
+  .btn-add:hover { background-color: #444; color: #fff; }
+  .input-group-horizontal { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .input-group-horizontal input, .input-group-horizontal select { flex: 1; }
+  .file-preview { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; }
+  .file-item { border: 1px solid #000; padding: 0.5rem; border-radius: 0.5rem; background: #f8f8f8; display: flex; align-items: center; justify-content: space-between; width: 250px; }
+  .file-item button { background: #000; color: #fff; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+  .file-item button:hover { background: #444; }
+  .profile-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid #000; }
+  .popup-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index: 1000; }
+  .popup-overlay img { max-width: 90%; max-height: 90%; border-radius: 1rem; }
+  .popup-overlay.show { display: flex; }
+  .duration { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="boxed py-2 d-flex justify-content-between align-items-center">
+    <a href="Careers_Interstolix.html"><img src="translight1.png" alt="Interstolix Logo" height="40"></a>
+    <div>
+      <a href="profile.html" class="me-3">Profile</a>
+      <a href="Logout">Logout</a>
+    </div>
+  </div>
+</div>
+
+<div class="boxed">
+  <h2>User Profile</h2>
+
+  <!-- Profile Picture & Personal Info -->
+  <div class="profile-section">
+    <div class="section-header">
+      <h5>Personal Info</h5>
+    </div>
+    <div class="input-group-horizontal align-items-center">
+      <div>
+        <img id="profilePicPreview" class="profile-pic" src="pic .png" alt="Profile Picture">
+        <input type="file" id="profilePicInput" accept="image/*" class="form-control mt-2">
+      </div>
+      <div style="flex: 2;">
+        <input type="text" placeholder="Full Name" class="form-control mb-2">
+        <input type="email" placeholder="Email" class="form-control mb-2">
+        <input type="tel" placeholder="Phone" class="form-control mb-2">
+        <input type="text" placeholder="Country" class="form-control mb-2">
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience Section -->
+  <div class="profile-section" id="experienceSection">
+    <div class="section-header">
+      <h5>Experience</h5>
+      <button class="btn-add" onclick="addExperience()">Add Experience</button>
+    </div>
+  </div>
+
+  <!-- Education Section -->
+  <div class="profile-section" id="educationSection">
+    <div class="section-header">
+      <h5>Education</h5>
+      <button class="btn-add" onclick="addEducation()">Add Education</button>
+    </div>
+  </div>
+
+  <!-- Certificates Section -->
+  <div class="profile-section" id="certificatesSection">
+    <div class="section-header">
+      <h5>Certificates</h5>
+      <button class="btn-add" onclick="addCertificate()">Add Certificate</button>
+    </div>
+  </div>
+
+  <!-- Resume & Cover Letter Section -->
+  <div class="profile-section">
+    <div class="section-header">
+      <h5>Resume & Cover Letter</h5>
+    </div>
+    <input type="file" id="resumeInput" class="form-control mb-2" accept=".pdf,.doc,.docx">
+    <div class="file-preview" id="resumePreview"></div>
+  </div>
+</div>
+
+<!-- Profile Picture Popup -->
+<div class="popup-overlay" id="profilePicPopup" onclick="closePopup()">
+  <img id="popupImage" src="" alt="Profile Preview">
+</div>
+
+<script>
+  // Profile Pic Preview & Popup
+  const profilePicInput = document.getElementById('profilePicInput');
+  const profilePicPreview = document.getElementById('profilePicPreview');
+  const popupOverlay = document.getElementById('profilePicPopup');
+  const popupImage = document.getElementById('popupImage');
+
+  profilePicInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = () => { profilePicPreview.src = reader.result; popupImage.src = reader.result; }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  profilePicPreview.addEventListener('click', () => popupOverlay.classList.add('show'));
+  function closePopup() { popupOverlay.classList.remove('show'); }
+
+  // Dynamic Sections
+  const experienceSection = document.getElementById('experienceSection');
+  const educationSection = document.getElementById('educationSection');
+  const certificatesSection = document.getElementById('certificatesSection');
+  const resumeInput = document.getElementById('resumeInput');
+  const resumePreview = document.getElementById('resumePreview');
+
+  function addExperience() {
+    const div = document.createElement('div');
+    div.classList.add('input-group-horizontal', 'mb-2');
+    div.innerHTML = `
+      <input type="text" placeholder="Company Name" class="form-control">
+      <input type="text" placeholder="Role" class="form-control">
+      <input type="month" placeholder="Start" class="form-control startDate">
+      <input type="month" placeholder="End" class="form-control endDate">
+      <label><input type="checkbox" class="form-check-input currentJob"> Current</label>
+      <span class="duration"></span>
+      <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    experienceSection.appendChild(div);
+    attachExperienceCalc(div);
+  }
+
+  function attachExperienceCalc(div) {
+    const start = div.querySelector('.startDate');
+    const end = div.querySelector('.endDate');
+    const current = div.querySelector('.currentJob');
+    const duration = div.querySelector('.duration');
+
+    function calculate() {
+      const startDate = new Date(start.value + '-01');
+      const endDate = current.checked ? new Date() : new Date(end.value + '-01');
+      if(!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        let months = (endDate.getFullYear() - startDate.getFullYear())*12 + (endDate.getMonth() - startDate.getMonth());
+        let years = Math.floor(months/12);
+        months = months % 12;
+        duration.textContent = `${years} yrs ${months} mos`;
+      }
+    }
+
+    start.addEventListener('change', calculate);
+    end.addEventListener('change', calculate);
+    current.addEventListener('change', calculate);
+  }
+
+  function addEducation() {
+    const div = document.createElement('div');
+    div.classList.add('input-group-horizontal', 'mb-2');
+    div.innerHTML = `
+      <input type="text" placeholder="Degree" class="form-control">
+      <input type="text" placeholder="University" class="form-control">
+      <input type="month" placeholder="Start" class="form-control startDate">
+      <input type="month" placeholder="End" class="form-control endDate">
+      <span class="duration"></span>
+      <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    educationSection.appendChild(div);
+    attachEducationCalc(div);
+  }
+
+  function attachEducationCalc(div) {
+    const start = div.querySelector('.startDate');
+    const end = div.querySelector('.endDate');
+    const duration = div.querySelector('.duration');
+
+    function calculate() {
+      const startDate = new Date(start.value + '-01');
+      const endDate = new Date(end.value + '-01');
+      if(!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        let months = (endDate.getFullYear() - startDate.getFullYear())*12 + (endDate.getMonth() - startDate.getMonth());
+        let years = Math.floor(months/12);
+        months = months % 12;
+        duration.textContent = `${years} yrs ${months} mos`;
+      }
+    }
+
+    start.addEventListener('change', calculate);
+    end.addEventListener('change', calculate);
+  }
+
+  function addCertificate() {
+    const div = document.createElement('div');
+    div.classList.add('input-group-horizontal', 'mb-2');
+    div.innerHTML = `
+      <input type="text" placeholder="Certificate Name" class="form-control">
+      <input type="text" placeholder="Organization" class="form-control">
+      <input type="month" placeholder="Issue" class="form-control">
+      <input type="month" placeholder="Expiry" class="form-control">
+      <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    certificatesSection.appendChild(div);
+  }
+
+  resumeInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(file) {
+      const div = document.createElement('div');
+      div.classList.add('file-item');
+      div.innerHTML = `
+        <span>${file.name}</span>
+        <button onclick="downloadFile('${URL.createObjectURL(file)}', '${file.name}')">Download</button>
+      `;
+      resumePreview.appendChild(div);
+    }
+  });
+
+  function downloadFile(url, name) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+</script>
+</body>
+</html>
